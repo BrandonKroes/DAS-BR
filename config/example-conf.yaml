@@ -1,0 +1,12 @@
+worker:
+  blender_path: "/local/batkroes/blender-3.3.1-linux-x64"
+  host: node305
+  port: 9999
+  cycles_device: CUDA
+  benchmark_score: 1000
+master:
+  host: node304
+  port: 7777
+
+
+

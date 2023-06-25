@@ -1,0 +1,5 @@
+example
+.idea
+*.pyc
+*.mp4
+config/conf.yaml
