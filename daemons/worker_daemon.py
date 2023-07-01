@@ -12,8 +12,8 @@ from common.cron import AbstractCron
 from common.cron.cron_heart_beat import CronHeartBeat
 from daemons import OperatorDaemon, OperatorTypes
 from common.communication import ReceiveSocket, SendSocket, EndpointConfig
-from common.packets import RegisterClient
-from common.packets.job_type import JobType, AbstractPacket
+from common.packets import RegisterClient, AbstractPacket
+from common.packets.job_type import JobType
 from common.parser.yaml_parser import YAMLParser
 
 
@@ -123,7 +123,7 @@ class WorkerDaemon(OperatorDaemon):
                     #    if self.cluster[0]['worker_id'] == self.worker_id:
                     #         # I HAVE THE POWER, time to restart to master mode!
                     #         os.system(
-                    # "/home/batkroes/DDPS2/factory_daemon.py --operator MASTER --configuration_location " + self.config_path)
+                    # "/home/batkroes/DAS-BR/factory_daemon.py --operator MASTER --configuration_location " + self.config_path)
 
                     #        # See yah
                     #        self.shutdown()

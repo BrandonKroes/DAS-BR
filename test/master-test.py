@@ -9,7 +9,7 @@ from common.packets import ShutdownPacket, JobType
 sys.path.append(
     os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 
-md = MasterDaemon("/local/batkroes/DDPS2/config/conf.yaml")
+md = MasterDaemon("/local/batkroes/DAS-BR/config/conf.yaml")
 md.boot()
 # md.process_packet_operation(njp)
 md.main()
