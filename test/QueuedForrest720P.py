@@ -9,7 +9,7 @@ from daemons import WorkerDaemon
 
 njp = BlenderQueuedOperation(1, data_packet={
     'job_type': JobType.OPERATION,
-    'blender_file_path': '/home/batkroes/untitled.blend',
+    'blender_file_path': '/home/batkroes/Forrest720P.blend',
     'start_frame': 1, 'stop_frame': 5,
     'frame_rate': '24',
     'output_path': "/var/scratch/batkroes/Forrest720PQueued",
