@@ -46,7 +46,8 @@ class MasterDaemon(OperatorDaemon):
             x.start()
 
     def boot(self):
-        self.cron.append(CronWorkerManager())
+        pass
+        #self.cron.append(CronWorkerManager())
 
     def check_for_cron(self):
         for cron_operation in self.cron:

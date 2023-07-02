@@ -72,33 +72,25 @@ class TaskBlender(AbstractTask):
         self.render_process = subprocess
         running_process = self.render_process.Popen([self.blender_path + " ".join(args) + " ".join(extra_args)],
                                                     shell=True,
-                                                    stdout=subprocess.PIPE, bufsize=1)
+                                                    stdout=subprocess.PIPE)
         while running_process.poll() is None:
             line = running_process.stdout.readline()
-            self.process_line(line.decode("utf-8"))
-            if self.first_frame:
-                self.frame_progress = False
-                self.first_frame = False
-            elif self.frame_progress is True:
-                self.frame_progress = False
-                from common.packets import JobType
-                from common.packets import PrintPacket
-                worker.send_packet(
-                    EndpointConfig(host=worker.master_host, port=worker.master_port,
-                                   packet=PrintPacket(packet_id=1, job_type=JobType.OPERATION,
-                                                      data_packet={'operation_reference': self.operation_reference,
-                                                                   'worker_id': worker.worker_id,
-                                                                   'packet_reference': self.frame_count})))
+            done = self.process_line(line.decode("utf-8"))
+
+            if done:
+                running_process.kill()
+                break
             self.finished = True
+        print("blender render done")
 
     def process_line(self, line):
         # Example line: Fra:1 Mem:163.57M (Peak 163.59M)
         # search for digit
+
         if len(line) > 10:
             buffer = ""
-
             prepend = line[0:4]
-
+            quit_check = line[0:12]
             if prepend == "Fra:":  # if it is a frame
                 for c in line[4:-1]:
                     from curses.ascii import isdigit
@@ -106,10 +98,12 @@ class TaskBlender(AbstractTask):
                         buffer += c
                     else:
                         break
-
                 if self.frame_count < int(buffer):
                     self.frame_progress = True
                     self.frame_count = int(buffer)
+            if quit_check == "Blender quit":
+                return True
+            return False
 
     def render_status(self):
         if self.init:

@@ -25,6 +25,7 @@ class BlenderQueuedOperation:
     frame_rate = ""
     frames_to_render = []
     nodes = []
+    outstanding_packets = []
 
     def __init__(self, operation_id, data_packet):
         self.total_time = None
@@ -37,23 +38,19 @@ class BlenderQueuedOperation:
         self.output_path = data_packet['output_path']
 
     def orchestrate_cluster(self, nodes):
-
         self.start_time = datetime.datetime.now()
         self.nodes = nodes
-        packet_id = 0
         frame_count = (self.stop_frame + 1) - self.start_frame
 
         for frame in range(frame_count):
             self.frames_to_render.append(frame + self.start_frame)
 
         for i in range(len(nodes)):
-            if not self.frames_to_render:
-                front_queue = self.frames_to_render.pop(0)
-                ec = EndpointConfig(host=nodes[i][0]['worker']['host'],
-                                    port=nodes[i][0]['worker']['port'],
-                                    packet=self.send_package(front_queue, i))
-                self.packets.append(ec)
-                packet_id += 1
+            front_queue = self.frames_to_render.pop(0)
+            ec = EndpointConfig(host=nodes[i][0]['worker']['host'],
+                                port=nodes[i][0]['worker']['port'],
+                                packet=self.send_package(front_queue, i))
+            self.packets.append(ec)
 
         self.orchestrated = True
 
@@ -86,37 +83,46 @@ class BlenderQueuedOperation:
         return t_packet
 
     def process_progress_packet(self, received_packet):
+        '''
+        {'operation_reference': 1, 'packet_reference': 1, 'blender_file_path': '/home/batkroes/Forrest720P.blend', 'start_frame': 1, 'stop_frame': 1, 'output_folder': '/var/scratch/batkroes/Forrest720PQueued1/', 'engine': 'CYCLES', 'worker': 0}
+        '''
+
+        frames_completed = []
         backup_packet = []
-        for packet in self.packets:
-            print(received_packet)
-            if packet.packet.data_packet['packet_reference'] != received_packet['packet_reference']:
+        for packet in self.outstanding_packets:
+            if packet.data_packet['packet_reference'] != received_packet['packet_reference']:
                 backup_packet.append(packet)
-        self.packets = backup_packet
+        self.outstanding_packets = backup_packet
+        self.packets = []
 
-        if not self.frames_to_render:
-
+        if len(self.frames_to_render) > 0:
+            pass
             front_queue = self.frames_to_render.pop(0)
-            ec = EndpointConfig(host=self.nodes[received_packet.worker][0]['worker']['host'],
-                                port=self.nodes[received_packet.worker][0]['worker']['port'],
-                                packet=self.send_package(front_queue, received_packet.worker))
+            ec = EndpointConfig(host=self.nodes[received_packet['worker']][0]['worker']['host'],
+                                port=self.nodes[received_packet['worker']][0]['worker']['port'],
+                                packet=self.send_package(front_queue, received_packet['worker']))
 
             self.packets.append(ec)
         else:
-            if 0 == len(self.frames_to_render) and 0 == len(self.packets):
+            if 0 == len(self.frames_to_render) and 0 == len(self.packets) and 0 == len(self.outstanding_packets):
+                self.finished = True
                 self.on_cluster_complete()
 
     def send_package(self, frame, worker):
+
         brp = BlenderRenderPacket(frame, job_type=JobType.RENDER,
                                   data_packet={
                                       'operation_reference': self.operation_id,
                                       'packet_reference': frame,
                                       'blender_file_path': self.blender_file_path,
                                       'start_frame': frame,
-                                      'stop_frame': frame + 1,
+                                      'stop_frame': frame,
                                       'output_folder': self.output_path + str(self.operation_id) + "/",
                                       'engine': self.engine,
                                       'worker': worker,
                                   })
+        print(brp.__dict__)
+        self.outstanding_packets.append(brp)
         return brp
 
     def print(self):
@@ -130,10 +136,13 @@ class BlenderQueuedOperation:
                 self.operation_id) + "/" + str(
                 self.operation_id) + ".mp4  "
 
-            self.finished = True
+            print(self.start_time.strftime("%d/%m/%Y %H:%M:%S"))
             self.end_time = datetime.datetime.now()
+            print(self.end_time.strftime("%d/%m/%Y %H:%M:%S"))
             self.total_time = self.end_time - self.start_time
-
+            print(self.total_time.total_seconds())
+            print(merge_command)
+            '''
             open(self.output_path + str(
                 self.operation_id) + "/" + self.start_time.strftime("%H %M %S") + ".txt", "x")
             with open(self.output_path + str(
@@ -141,3 +150,4 @@ class BlenderQueuedOperation:
                 file.write('start time: ' + self.start_time.strftime("%d/%m/%Y %H:%M:%S") + "\n")
                 file.write('end time: ' + self.end_time.strftime("%d/%m/%Y %H:%M:%S") + "\n")
                 file.write('duration: ' + str(self.total_time.total_seconds()) + "\n")
+            '''

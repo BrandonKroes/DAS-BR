@@ -16,6 +16,7 @@ class BlenderRenderPacket(AbstractPacket):
             self.data_packet['cycles_device'] = "undefined"
         jb = TaskBlender(**self.data_packet)
         jb.execute(worker)
+        print(self.data_packet)
 
     def done_worker_side(self, worker: 'WorkerDaemon'):
         self.finished = True
@@ -23,4 +24,4 @@ class BlenderRenderPacket(AbstractPacket):
         return
 
     def execute_master_side(self, master):
-        master.operations_manager.operation_callback(packet=self, master=self)
+        master.operations_manager.operation_callback(packet=self, master=master)

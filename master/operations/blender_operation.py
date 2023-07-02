@@ -77,7 +77,6 @@ class BlenderOperation:
             # this operation had nothing to do with this task!
             return
 
-        # TODO: Dynamically decide which node should be picked!
         default_node = master.nodes[0]
         node_info = default_node[0]
 
@@ -101,7 +100,6 @@ class BlenderOperation:
     def process_progress_packet(self, received_packet):
         backup_packet = []
         for packet in self.packets:
-            print(received_packet)
             if packet.packet.data_packet['packet_reference'] != received_packet['packet_reference']:
                 backup_packet.append(packet)
         self.packets = backup_packet
@@ -124,6 +122,9 @@ class BlenderOperation:
         self.end_time = datetime.datetime.now()
         self.total_time = self.end_time - self.start_time
 
+        print(merge_command)
+
+        '''
         open(self.output_path + str(
             self.operation_id) + "/" + self.start_time.strftime("%H %M %S") + ".txt", "x")
         with open(self.output_path + str(
@@ -131,3 +132,4 @@ class BlenderOperation:
             file.write('start time: ' + self.start_time.strftime("%d/%m/%Y %H:%M:%S") + "\n")
             file.write('end time: ' + self.end_time.strftime("%d/%m/%Y %H:%M:%S") + "\n")
             file.write('duration: ' + str(self.total_time.total_seconds()) + "\n")
+        '''

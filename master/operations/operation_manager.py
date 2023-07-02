@@ -13,7 +13,7 @@ class OperationManager:
     def report_node_failure(self, master, node):
         for operation in self.operations:
             operation.node_failure(master=master, failure_node=node)
-        self.instantiate_operation(master, ClusterNotifyOperation())
+        # self.instantiate_operation(master, ClusterNotifyOperation())
 
     def instantiate_operation(self, master, data_packet):
         self.operation_count += 1
@@ -27,6 +27,8 @@ class OperationManager:
         for operation in self.operations:
             if operation.operation_id == packet.data_packet['operation_reference']:
                 operation.process_progress_packet(packet.data_packet)
+                for packet in operation.get_packets():
+                    master.send_packet(packet)
 
     def main(self, master):
         pass

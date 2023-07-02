@@ -12,9 +12,9 @@ njp = BlenderOperation(1, data_packet={
     'blender_file_path': '/home/batkroes/blender-files/Forrest720P.blend',
     'start_frame': 1, 'stop_frame': 120,
     'frame_rate': '24',
-    'output_path': "/var/scratch/batkroes/Forrest720P",
+    'output_path': "/home/batkroes/Forrest720P",
     'engine': "CYCLES"})
-wd = WorkerDaemon("../config/conf.yaml")
+wd = WorkerDaemon("/home/batkroes/DAS-BR/config/conf.yaml")
 wd.add_scheduled_job(NewOperationPacket(packet_id=1, job_type=JobType.OPERATION,
                                         data_packet=njp))
 wd.main()

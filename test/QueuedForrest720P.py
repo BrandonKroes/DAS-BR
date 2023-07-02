@@ -9,12 +9,12 @@ from daemons import WorkerDaemon
 
 njp = BlenderQueuedOperation(1, data_packet={
     'job_type': JobType.OPERATION,
-    'blender_file_path': '/home/batkroes/blender-files/Forrest720P.blend',
-    'start_frame': 1, 'stop_frame': 120,
+    'blender_file_path': '/home/batkroes/untitled.blend',
+    'start_frame': 1, 'stop_frame': 5,
     'frame_rate': '24',
     'output_path': "/var/scratch/batkroes/Forrest720PQueued",
     'engine': "CYCLES"})
-wd = WorkerDaemon("../config/conf.yaml")
+wd = WorkerDaemon("/home/batkroes/DAS-BR/config/conf.yaml")
 wd.add_scheduled_job(NewOperationPacket(packet_id=1, job_type=JobType.OPERATION,
                                         data_packet=njp))
 wd.main()

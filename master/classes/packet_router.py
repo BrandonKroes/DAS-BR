@@ -7,10 +7,12 @@ class PacketRouter:
 
     @staticmethod
     def new_packet(master, packet: AbstractPacket):
+        '''
         try:
             packet.print()
         except TypeError:
             print("Type lacks a print function")
+        '''
         if packet.job_type is JobType.OPERATION:
             master.operations_manager.operation_callback(master, packet)
         if packet.job_type is JobType.NEW_OPERATION:

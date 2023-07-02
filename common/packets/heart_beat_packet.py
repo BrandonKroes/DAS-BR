@@ -12,6 +12,7 @@ class HeartBeatPacket(AbstractPacket):
 
     def execute_master_side(self, master):
         workers = []
+        '''
         if self.data_packet is not None:
             print("Node: " + str(self.data_packet) + " informing the server of my status!")
             for (node, status) in master.workers:
@@ -20,3 +21,4 @@ class HeartBeatPacket(AbstractPacket):
                     status['attempt'] = 0
                 workers.append((node, status))
             master.workers = workers
+        '''
